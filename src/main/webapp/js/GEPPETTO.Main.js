@@ -365,6 +365,7 @@ FE.loadingModalUIUpdate = function()
 	//Responds to user selecting url radio button
 	$("#urlRadio").click(function() {
 		$('#customRadio').val("inactive");
+		$('#customInputDiv').addClass("hide");
 		$('#customInputDiv').hide();
 		$('#urlInput').show();		
 	});
@@ -374,6 +375,7 @@ FE.loadingModalUIUpdate = function()
 		//Handles the events related the content edit area
 		$('#customRadio').val("active");
 		$('#urlInput').hide();	
+		$('#customInputDiv').removeClass("hide");
 		$('#customInputDiv').show();
 		
 		//update editor with latest simulation file selected

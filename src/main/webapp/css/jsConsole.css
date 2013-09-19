@@ -19,6 +19,13 @@
 	   -moz-box-shadow:none;
 	        box-shadow:none;
 }
+
+#console, #console:before, #console:after {
+-webkit-box-sizing:content-box!important;
+-moz-box-sizing:content-box!important;
+box-sizing:content-box!important;
+}
+
 #console {
 	background:rgba(66,59,59,0.50);
 	color: #ccc;

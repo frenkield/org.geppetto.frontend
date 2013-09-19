@@ -19,7 +19,7 @@
 		<script src="js/vendor/rAF.js"></script>
 		<script src="js/vendor/codemirror.js"></script>
 		<script src="js/vendor/xml.js"></script>
-		<script src="js/vendor/formatting.js"></script>		
+		<script src="js/vendor/formatting.js"></script>
 
 		<!-- Geppetto -->
 		<script src="js/GEPPETTO.js"></script>
@@ -30,71 +30,63 @@
 		<script src="js/GEPPETTO.Resources.js"></script>
 		<script src="js/geppetto-objects/Simulation.js"></script>
 		<script src="js/geppetto-objects/G.js"></script>
-		
+
 		<!-- CSS -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
-		<link rel="stylesheet" href="css/font-awesome.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
 		<link rel="stylesheet" href="css/style.css" />
-		<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.0.custom.css" />
+		<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.3.custom.css" />
 		<link rel="stylesheet" href="css/codemirror.css" />
 		<link rel="stylesheet" href="css/lesser-dark.css" />
 		<link rel="stylesheet" href="css/jsConsole.css" />
 
 	</head>
-	<link rel="icon" 
-      type="image/png" 
-      href="images/favicon.png"/>
+	<link rel="icon" type="image/png" href="images/favicon.png"/>
 	<body>
-	<div id="controls">
+		<div id="controls">
 
-		<div id="sim_toolbar">
-			<a href="#loadSimModal" role="button" class="btn" data-toggle="modal"
-				data-keyboard="false" id="openload"><icon
-					class="icon-folder-open-alt"></icon> Load Simulation</a>
-			<button class="btn" id="start">
-				<icon class="icon-play"></icon>
-				Start
-			</button>
-			<button class="btn" id="pause">
-				<icon class="icon-pause"></icon>
-				Pause
-			</button>
-			<button class="btn" id="stop">
-				<icon class="icon-stop"></icon>
-				Stop
-			</button>
+			<div id="sim_toolbar">
+				<a href="#loadSimModal" role="button" class="btn btn-default" data-toggle="modal" data-keyboard="false" id="openload"><icon class="icon-folder-open-alt"></icon> Load Simulation</a>
+				<button class="btn btn-default" id="start">
+					<icon class="icon-play"></icon>
+					Start
+				</button>
+				<button class="btn btn-default" id="pause">
+					<icon class="icon-pause"></icon>
+					Pause
+				</button>
+				<button class="btn btn-default" id="stop">
+					<icon class="icon-stop"></icon>
+					Stop
+				</button>
 
-			<!-- Alert box used when visitor in observing simulation -->
-			<div id="alertbox" class="alert alert-block">
-				<a class="close" data-dismiss="alert">×</a>
-				<h4 class="alert-heading" align="center">
-					<i class="icon-info-sign icon-2x" id="infopopover" rel="popover"
-						data-placement="left" data-trigger="hover"></i>Observing
-					Simulation Mode
-				</h4>
-				<p id="alertbox-text"></p>
+				<!-- Alert box used when visitor in observing simulation -->
+				<div id="alertbox" class="alert alert-block">
+					<a class="close" data-dismiss="alert">×</a>
+					<h4 class="alert-heading" align="center"><i class="icon-info-sign icon-2x" id="infopopover" rel="popover" data-placement="left" data-trigger="hover"></i>Observing Simulation Mode </h4>
+					<p id="alertbox-text"></p>
+				</div>
+			</div>
+
+			<div id="position_toolbar">
+				<button class="btn btn-default squareB icon-chevron-left" id="w"></button>
+				<button class="btn btn-default squareB icon-chevron-up" id="n"></button>
+				<button class="btn btn-default squareB icon-chevron-right" id="e"></button>
+				<button class="btn btn-default squareB icon-chevron-down" id="s"></button>
+				<button class="btn btn-default squareB icon-home" id="h"></button>
+
+				<button class="btn btn-default squareB icon-undo" id="rw"></button>
+				<button class="btn btn-default squareB icon-repeat rotate90" id="rn"></button>
+				<button class="btn btn-default squareB icon-repeat" id="re"></button>
+				<button class="btn btn-default squareB icon-undo rotate90" id="rs"></button>
+				<button class="btn btn-default squareB icon-home" id="rh"></button>
+
+				<button class="btn btn-default squareB icon-zoom-in" id="zi"></button>
+				<button class="btn btn-default squareB icon-zoom-out" id="zo"></button>
+				<br />
 			</div>
 		</div>
-
-		<div id="position_toolbar">
-			<button class="btn squareB icon-chevron-left" id="w"></button>
-			<button class="btn squareB icon-chevron-up" id="n"></button>
-			<button class="btn squareB icon-chevron-right" id="e"></button>
-			<button class="btn squareB icon-chevron-down" id="s"></button>
-			<button class="btn squareB icon-home" id="h"></button>
-
-			<button class="btn squareB icon-undo" id="rw"></button>
-			<button class="btn squareB icon-repeat rotate90" id="rn"></button>
-			<button class="btn squareB icon-repeat" id="re"></button>
-			<button class="btn squareB icon-undo rotate90" id="rs"></button>
-			<button class="btn squareB icon-home" id="rh"></button>
-
-			<button class="btn squareB icon-zoom-in" id="zi"></button>
-			<button class="btn squareB icon-zoom-out" id="zo"></button>
-			<br />
-		</div>
-	</div>
-	<!--
+		<!--
 		<div id="toolbar">
 		<div id="mode" class="btn-group" data-toggle="buttons-radio">
 		<button class="btn active" id="normalMode" checked="checked">Normal mode</button>
@@ -112,127 +104,131 @@
 		</div>
 		</div>
 		-->
-	<div id="mainContainer">
-		<div id="sim"></div>
+		<div id="mainContainer">
+			<div id="sim"></div>
 
-		<div id="footer">
-			<div id="footerHeader">
-				<div id="geppettologo"></div>
-				<div id="consoleButtonContainer">		
-					<button class="btn" data-clipboard-target="clipboard_text" id="consoleButton">
-						<icon class="icon-terminal"></icon>
-						Console
-					</button>
+			<div id="footer">
+				<div id="footerHeader">
+					<div id="geppettologo"></div>
+					<div id="consoleButtonContainer">
+						<button class="btn btn-default" data-clipboard-target="clipboard_text" id="consoleButton">
+							<icon class="icon-terminal"></icon>
+							Console
+						</button>
+					</div>
+				</div>
+				<div id="console">
+					Console Loading...
 				</div>
 			</div>
-			<div id="console">Console Loading...</div>
 		</div>
-	</div>
-	
-	<div id="loadSimModal" class="modal hide fade" tabindex="-1"
+
+		<div id="loadSimModal" class="modal fade" tabindex="-1"
 		role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
 		data-backdrop="static">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal"
-				aria-hidden="true">&times;</button>
-			<h3 id="myModalLabel">Load Simulation</h3>
-		</div>
-		<div class="modal-body">
-			<form class="form-horizontal">
-				<div class="control-group">
-					<div id="radioDiv" class="modal-input">
-						<div class="controls">
-							<label class="radio inline"> <input type="radio"
-								name="optionsRadios" id="urlRadio" value="active" checked>URL
-							</label> <label class="radio inline"> <input type="radio"
-								name="optionsRadios" id="customRadio" value="inactive">Custom
-							</label>
-						</div>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="btn btn-default close" data-dismiss="modal"
+						aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">Load Simulation</h4>
 					</div>
-				</div>
-				<div id="urlInput" class="control-group">
-					<div id="input" class="modal-input">
-						<label class="control-label" for="url">URL</label>
-						<div class="controls">
-							<input class="input-d\xlarge" id="url" type="text"
-								placeholder="Paste the URL of the simulation file...">
-						</div>
-					</div>
-				</div>
-				<div id="customInputDiv" class="control-group hide">
-					<div id="input" class="modal-input">
-						<label class="control-label">Content</label>
-						<div class="controls">
-							<textarea id="code" name="code"></textarea>
-							<button id="fullscreen" type="button"
-								class="button icon-fullscreen"></button>
-						</div>
-					</div>
-				</div>
-				<div id="samplesDiv" class="control-group">
-					<div id="input" class="modal-input">
-						<label class="control-label" for="dLabel">Samples</label>
-						<div class="controls">
-							<div class="btn-group">
-								<a class="btn dropdown-toggle" id="dLabel"
-									data-toggle="dropdown" href="#"><span
-									id="dropdowndisplaytext">Select simulation from list...</span><b
-									class="caret"></b></a>
-								<ul class="dropdown-menu" id="dropdownmenu"
-									aria-labelledby="dLabel">
-								</ul>
+					<div class="modal-body">
+						<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<div id="radioDiv" class="modal-input">
+									<div class="radio">
+										<label class="radio-inline">
+											<input type="radio"
+											name="optionsRadios" id="urlRadio" value="active" checked>
+											URL </label><label class="radio-inline">
+											<input type="radio"
+											name="optionsRadios" id="customRadio" value="inactive">
+											Custom </label>
+									</div>
+								</div>
 							</div>
-						</div>
+							<div id="urlInput" class="form-group">
+								<div id="input" class="modal-input">
+									<label class="col-lg-2 control-label" for="url">URL</label>
+									<div class="col-lg-10">
+										<input class="form-control input-d\xlarge" id="url" type="text"
+										placeholder="Paste the URL of the simulation file...">
+									</div>
+								</div>
+							</div>
+							<div id="customInputDiv" class="form-group hide">
+								<div id="input" class="modal-input">
+									<label class="col-lg-2 control-label">Content</label>
+									<div class="col-lg-10">
+										<textarea class="form-control" id="code" name="code"></textarea>
+										<button id="fullscreen" type="button" class="btn btn-default icon-fullscreen"></button>
+									</div>
+								</div>
+							</div>
+							<div id="samplesDiv" class="form-group">
+								<div id="input" class="modal-input">
+									<label class="col-lg-2 control-label" for="dLabel">Samples</label>
+									<div class="col-lg-10">
+										<div class="btn-group">
+											<a class="btn btn-default dropdown-toggle" id="dLabel" data-toggle="dropdown" href="#"><span id="dropdowndisplaytext">Select simulation from list...</span><b class="caret"></b></a>
+											<ul class="dropdown-menu" id="dropdownmenu" aria-labelledby="dLabel"></ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<a href="#" data-dismiss="modal" class="btn btn-default">Close</a>
+						<button id="load" class="btn btn-warning">Load</button>
 					</div>
 				</div>
-			</form>
+			</div>
 		</div>
-		<div class="modal-footer">
-			<a href="#" data-dismiss="modal" class="btn">Close</a>
-			<button id="load" class="btn btn-warning">Load</button>
-		</div>
-	</div>
 
-	<div id="infomodal"  class="modal hide fade" tabindex="-1"  aria-labelledby="infomodal-title" aria-hidden="true" data-backdrop="static">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-					×
-				</button>
-				<h3 id="infomodal-title"></h3>
-			</div>
-			<div class="modal-body">
-				<p id="infomodal-text">
-				</p>
-			</div>
-			<div class="modal-footer">
-				<button  id="infomodal-btn" class="btn btn-warning" data-dismiss="modal" aria-hidden="true">
-					Ok
-				</button>
+		<div id="infomodal"  class="modal fade" tabindex="-1"  aria-labelledby="infomodal-title" aria-hidden="true" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 id="infomodal-title"></h3>
+					</div>
+					<div class="modal-body">
+						<p id="infomodal-text"></p>
+					</div>
+					<div class="modal-footer">
+						<button  id="infomodal-btn" class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Ok</button>
+					</div>
+				</div>
 			</div>
 		</div>
-		
-		<div id="loadingmodal" class="loading modal hide well fade lead pagination-centered" data-keyboard="false" data-backdrop="static">
+
+		<div id="loadingmodal" class="loading modal well fade lead pagination-centered" data-keyboard="false" data-backdrop="static">
 			<i class="icon-asterisk icon-4x icon-spin orange"></i>
 			<p id="loadingmodaltext" class="orange"></p>
-		</div>		
-		<script type="text/template" id="tplSandbox">
-		<pre class="output"></pre>
-		<div class="input">
-			<textarea rows="1" id="commandInputArea" placeholder="<%= placeholder %>"></textarea>
 		</div>
-	</script>
-	
-	<!-- The command/result template (NB whitespace/line breaks matter inside <pre> tag): -->
-	<script type="text/template" id="tplCommand"><% if (! _hidden) { %><span class="command"><%= command %></span>
+
+		<script type="text/template" id="tplSandbox">
+			<pre class="output"></pre>
+			<div class="input">
+				<textarea rows="1" id="commandInputArea" placeholder="<%= placeholder %>"></textarea>
+			</div>
+		</script>
+
+		<!-- The command/result template (NB whitespace/line breaks matter inside <pre> tag): -->
+		<script type="text/template" id="tplCommand"><% if (! _hidden) { %><span class="command"><%= command %></span>
 <span class="prefix"><%= this.resultPrefix %></span><span class="<%= _class %>"><%= result %></span>
 <% } %></script>
 
-<script type="text/template" id="tplDebug"><span class="<%= _class %>"><%= result %></span></script>
+		<script type="text/template" id="tplDebug">span class="<%= _class %>"><%= result %></span></script>
 
 		<!-- The sandbox template: -->
 		<script src="js/vendor/underscore.min.js"></script>
 		<script src="js/vendor/backbone.min.js"></script>
 		<script src="js/vendor/backbone-localStorage.min.js"></script>
 		<script src="js/vendor/sandbox-console.js"></script>
-</body>
+	</body>
 </html>
