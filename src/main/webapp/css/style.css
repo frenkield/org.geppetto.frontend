@@ -372,12 +372,6 @@ input {
 	max-height: 50%;
 }
 
-* {
-  -webkit-border-radius: 12px !important;
-     -moz-border-radius: 12px !important;
-          border-radius: 12px !important;
-}
-
 body{
 	font-weight:100!important;
 }

@@ -154,6 +154,7 @@ GEPPETTO.SimulationContentEditor.createXMLEditor = function()
 		mode : "xml",
 		lineNumbers : true,
 		theme : "lesser-dark",
+		fixedGutter : false,
 		extraKeys :
 		{
 			"F11" : function(cm)
