@@ -435,6 +435,7 @@ define(function(require) {
 			 * @param css_url - stylesheet url for the widget
 			 */
 			installWidget: function(js_url, css_url) {
+				// NOTE: how do we make sure this is really a widget?
 				
 				// TODO: check if urls are valid urls and only call addScript/StyleSheet in that case 
 				
