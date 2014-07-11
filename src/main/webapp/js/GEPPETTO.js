@@ -849,16 +849,16 @@ define(function(require)
 		 * @param url
 		 */
 		addScript : function(url){
-			var result = "";
+			var result = GEPPETTO.Resources.ADDSCRIPT_SUCCESS;
 			
-			// TODO: validate url and throw error if invalid
+			// TODO: validate url - return GEPPETTO.Resources.ADDSCRIPT_FAIL if invalid
+			
 			$.getScript( url )
 			  .done(function( script, textStatus ) {
-			    result = GEPPETTO.Resources.ADDSCRIPT_SUCCESS;
+			    // not much to do here
 			  })
 			  .fail(function( jqxhr, settings, exception ) {
 			    GEPPETTO.log(exception);
-				result = GEPPETTO.Resources.ADDSCRIPT_FAIL;
 			});
 			
 			return result;
@@ -873,7 +873,7 @@ define(function(require)
 			var cssLink = $("<link rel='stylesheet' type='text/css' href='" + url + "'>");
 		    $("head").append(cssLink);
 			
-			return GEPPETTO.Resources.ADDSCRIPT_SUCCESS;
+			return GEPPETTO.Resources.ADDCSS_SUCCESS;
 		},
 		
 		/**
