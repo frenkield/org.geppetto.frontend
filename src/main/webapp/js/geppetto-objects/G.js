@@ -439,8 +439,8 @@ define(function(require) {
 				
 				// TODO: check if urls are valid urls and only call addScript/StyleSheet in that case 
 				
-				GEPPETTO.addScript(js_url);
-				GEPPETTO.addStyleSheet(css_url);
+				if (js_url != null) GEPPETTO.addScript(js_url);
+				if (css_url != null) GEPPETTO.addStyleSheet(css_url);
 				
 				return  GEPPETTO.Resources.INSTALL_WIDGET;
 			}
