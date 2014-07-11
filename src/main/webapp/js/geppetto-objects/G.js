@@ -425,8 +425,24 @@ define(function(require) {
 				GEPPETTO.incrementCameraZoom(z);
 				
 				return GEPPETTO.Resources.CAMERA_ZOOM_INCREMENT;
+			},
+			
+			/**
+			 * Installs widget given a js and a css file (css is optional)
+			 *
+			 * @name - G.installWidget()
+			 * @param js_url - javascript file url for the widget
+			 * @param css_url - stylesheet url for the widget
+			 */
+			installWidget: function(js_url, css_url) {
+				
+				// TODO: check if urls are valid urls and only call addScript/StyleSheet in that case 
+				
+				GEPPETTO.addScript(js_url);
+				GEPPETTO.addStyleSheet(css_url);
+				
+				return  GEPPETTO.Resources.INSTALL_WIDGET;
 			}
-
 		};
 	};
 });

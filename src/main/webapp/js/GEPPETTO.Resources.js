@@ -171,6 +171,8 @@ define(function(require) {
 			CAMERA_ZOOM_INCREMENT: "Zoom increment",
 			
 			CAMERA_RESET: "Camera reset",
+			
+			INSTALL_WIDGET: "Install Widget",
 
 			/**
 			 * GEPPETTO.Main resources
