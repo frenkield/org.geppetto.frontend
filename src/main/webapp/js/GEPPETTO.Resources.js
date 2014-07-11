@@ -230,6 +230,14 @@ define(function(require) {
 			UPDATE_FRAME_STARTING: "Starting update frame",
 
 			UPDATE_FRAME_END: "Ending update frame",
+			
+			ADDSCRIPT_SUCCESS: "Successfully added script",
+			
+			ADDSCRIPT_FAIL: "Could not add script",
+			
+			ADDCSS_SUCCESS: "Successfully added stylesheet",
+			
+			ADDCSS_FAIL: "Could not add stylesheet",
 
 			/**
 			 * GEPPETTO.SimulationContentEditor resources

@@ -846,6 +846,37 @@ define(function(require)
 		},
 		
 		/**
+		 * @param url
+		 */
+		addScript : function(url){
+			var result = "";
+			
+			// TODO: validate url and throw error if invalid
+			$.getScript( url )
+			  .done(function( script, textStatus ) {
+			    result = GEPPETTO.Resources.ADDSCRIPT_SUCCESS;
+			  })
+			  .fail(function( jqxhr, settings, exception ) {
+			    GEPPETTO.log(exception);
+				result = GEPPETTO.Resources.ADDSCRIPT_FAIL;
+			});
+			
+			return result;
+		},
+		
+		/**
+		 * @param url
+		 */
+		addStyleSheet : function(url){			
+			// TODO: validate url - return GEPPETTO.Resources.ADDSCRIPT_FAIL if invalid
+			
+			var cssLink = $("<link rel='stylesheet' type='text/css' href='" + url + "'>");
+		    $("head").append(cssLink);
+			
+			return GEPPETTO.Resources.ADDSCRIPT_SUCCESS;
+		},
+		
+		/**
 		 * @param msg
 		 */
 		log : function(msg)
