@@ -33,6 +33,7 @@
 /**
  * Plot Widget class
  *
+ * @module Plot
  * @author Jesus R. Martinez (jesus@metacell.us)
  */
 

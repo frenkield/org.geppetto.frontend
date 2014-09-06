@@ -35,9 +35,8 @@
  *
  * Global objects. Handles global operations; clearing js console history commands,
  * turning on/off debug statements, copying history commands, help info, etc.
- *=-
- * @constructor
-
+ *
+ * @module G
  * @author  Jesus R. Martinez (jesus@metacell.us)
  */
 define(function(require) {

@@ -34,13 +34,13 @@
  *
  * Base Widget Class, all widgets extend this class.
  *
+ * @module Widget
  * @author  Jesus R. Martinez (jesus@metacell.us)
  */
 
 /**
  * Parent Widget Base class
  */
-
 define(function(require) {
 
 	var Backbone = require('backbone');
@@ -145,6 +145,12 @@ define(function(require) {
 				return "Widget has been renamed to " + this.name;
 			},
 
+			/**
+			 * Sets the position of the widget
+			 * 
+			 * @param left - Location from left
+			 * @param top - Location from top
+			 */
 			setPosition: function(left, top) {
 
 				this.position.left = left;
@@ -154,6 +160,12 @@ define(function(require) {
 				return this.name + " Widget's position has been updated";
 			},
 
+			/**
+			 * Sets the size of the widget
+			 * 
+			 * @param h - Height of the widget
+			 * @param w - Width of the widget
+			 */
 			setSize: function(h, w) {
 				this.size.height = h;
 				this.size.width = w;
@@ -162,10 +174,20 @@ define(function(require) {
 				return this.name + " Widget has been resized";
 			},
 
+			/**
+			 * Get the position of the widget
+			 * 
+			 * @returns {object} - Object with position of widget {left , top }
+			 */
 			getPosition: function() {
 				return this.position;
 			},
 
+			/**
+			 * Returns the size of the widget
+			 * 
+			 * @returns {object} - Object with size of widget {h , w }
+			 */
 			getSize: function() {
 				return this.size;
 			},
@@ -195,6 +217,9 @@ define(function(require) {
 			 * E.g. If obj = {"tree":{"v":1}} and path is "tree.v", it will
 			 * search within the obj to find the value of "tree.v", returning object 
 			 * containing {value : val, unit : unit, scale : scale}.
+			 * 
+			 * @param tree - Tree object to traverse 
+			 * @param state - Variable that needs to be matched to a value inside the tree
 			 */
 			getState : function(tree, state) {
 				var paths = state.split('.')

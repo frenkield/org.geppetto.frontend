@@ -33,7 +33,7 @@
 /**
  * Controller class for plotting widget. Use to make calls to widget from inside Geppetto.
  *
- * @constructor
+ * @module PlotsController
  *
  * @author Jesus R Martinez (jesus@metacell.us)
  */

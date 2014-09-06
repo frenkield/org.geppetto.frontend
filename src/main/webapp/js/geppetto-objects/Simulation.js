@@ -36,7 +36,7 @@
  * Class for the Simulation Object. Handles user's request to start, stop, pause,
  * and/or load a simulation.
  *
- * @constructor
+ * @module Simulation
  *
  * @author matteo@openworm.org (Matteo Cantarelli)
  * @author giovanni@openworm.org (Giovanni Idili)
@@ -511,5 +511,5 @@ define(function(require) {
 				return GEPPETTO.Resources.SIMULATION_NOT_LOADED_ERROR;
 			}
 		};
-	}
+	};
 });

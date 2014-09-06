@@ -19572,21 +19572,6 @@ define('SandboxConsole',['require','backbone','jquery','underscore','vendor/back
 				},
 
 
-				verifyCommand : function(command){
-					// Evaluate the command and store the eval result, adding some basic classes for syntax-highlighting
-					try {
-						var result = this.model.get('iframe') ? this.iframeEval(command) : eval.call(window, command);
-						if(_.isUndefined(result)) {
-							return false;
-						}
-					}
-					catch(error) {
-						return false;
-					}
-					
-					return true;
-				},
-				
 				// Creates the sandbox iframe, if needed, and stores it
 				iframeSetup: function() {
 					this.sandboxFrame = $('<iframe width="0" height="0"/>').css({visibility: 'hidden'}).appendTo('body')[0];
@@ -38003,7 +37988,7 @@ define('components/popups/InfoModal',['require','react','jquery','jsx!components
         },
         
         render: function (){
-        	return React.DOM.div( {className:"modal fade", id:"infomodal", 'data-target':".bs-example-modal-sm"}, 
+        	return React.DOM.div( {className:"modal fade", id:"infomodal"}, 
         			React.DOM.div( {className:"modal-dialog"}, 
         			React.DOM.div( {className:"modal-content"}, 
         				React.DOM.div( {className:"modal-header", id:"infomodal-header"}, 
@@ -38428,21 +38413,22 @@ define('GEPPETTO.ScriptRunner',['require'],function(require) {
 							return;
 						}
 						else {
+							//waiting for previous command to be done, exit loop
 							if(waitingForPreviousCommand){
 								return;
 							}
+							//execute command
 							else{
 								GEPPETTO.Console.executeCommand(command);
+								//keep track of reamaining commands
 								var clone = commands.slice();
 								remainingCommands = clone.splice(i+1, clone.length-1);
 							}
 						}
 					}
 				}
-			},
-			
-			nextCommand : function(command){
 				
+				runningScript = false;
 			},
 
 			/**
@@ -38485,6 +38471,7 @@ define('GEPPETTO.ScriptRunner',['require'],function(require) {
 								//reset flag if no longer waiting for commands to process
 								waitingForPreviousCommand = false;
 								
+								//execute remaining commands
 								GEPPETTO.ScriptRunner.executeScriptCommands(remainingCommands);
 							}
 						}
@@ -40656,13 +40643,13 @@ define('geppetto-objects/Simulation',['require'],function(require) {
 			 * The transfer function should accept the value of the watched var and output a
 			 * number between 0 and 1, corresponding to min and max brightness.
 			 * If no transfer function is specified then brightess = value
-			 * @param entityName
-			 * @param varName
+			 * @param entity
+			 * @param variable
 			 * @param transferFunction
 			 */
-			addBrightnessFunction: function(entityName, varName, transferFunction) {	
-				this.listeners[varName] = (function (simState){
-					GEPPETTO.lightUpEntity(entityName, transferFunction ? transferFunction(simState.value) : simState.value);
+			addBrightnessFunction: function(entity, variable, transferFunction) {	
+				this.listeners[variable.getInstancePath()] = (function (simState){
+					GEPPETTO.lightUpEntity(entity.getInstancePath(), transferFunction ? transferFunction(simState.value) : simState.value);
 				});
 			},
 
@@ -40670,8 +40657,8 @@ define('geppetto-objects/Simulation',['require'],function(require) {
 			 * Clear brightness transfer functions on simulation state
 			 * @param varName
 			 */
-			clearBrightnessFunctions: function(varName) {
-				this.listeners[varName] = null;
+			clearBrightnessFunctions: function(variable) {
+				this.listeners[variable.getId()] = null;
 			}
 		};
 
@@ -41300,6 +41287,10 @@ define('GEPPETTO.Main',['require','jquery','react','jsx!components/popups/InfoMo
 
 							//unbind click event so we can reuse same modal for other alerts
 							infomodalBtn.unbind('click');
+							
+							if(GEPPETTO.Simulation.isLoading()){
+				                GEPPETTO.trigger('simulation:show_spinner');
+							}
 						});                                         
 					}
 
@@ -42049,11 +42040,14 @@ define('widgets/plot/Plot',['require','widgets/Widget','jquery'],function(requir
 					}
 				}
 
+				var labelsMap = this.labelsMap;
+				
 				//set label legends to shorter label
 				this.options.legend = {
 						labelFormatter: function(label, series){
 		        		var split = label.split(".");
 						var shortLabel = split[0] +"."+split[1]+"....." + split[split.length-1];
+						labelsMap[label] = {label : shortLabel};
 		        		return '<div class="legendLabel" id="'+label+'" title="'+label+'">'+shortLabel+'</div>';
 		        	}
 		        };
@@ -42073,9 +42067,7 @@ define('widgets/plot/Plot',['require','widgets/Widget','jquery'],function(requir
 							label : id,
 							variable : state,
 							data : [ [0,value] ]
-						});
-						
-						this.labelsMap[id] = {label : id};
+						});						
 					}
 				}
 
@@ -42088,8 +42080,10 @@ define('widgets/plot/Plot',['require','widgets/Widget','jquery'],function(requir
 					this.plot = $.plot(plotHolder, this.datasets, this.options);
 				}
 				
+				//fix conflict between jquery and bootstrap tooltips
 				$.widget.bridge('uitooltip', $.ui.tooltip);
 				
+				//show tooltip for legends
 				$(".legendLabel").tooltip();
 				
 				return "Line plot added to widget";
@@ -42281,8 +42275,39 @@ define('widgets/plot/Plot',['require','widgets/Widget','jquery'],function(requir
 				this.plot = $.plot($("#" + this.id), this.datasets, this.options);
 			},
 			
-			setLabels : function(labels){
+			/**
+			 * Sets the legend for a variable
+			 * 
+			 @name setLegend(variable, legend)
+			 * @param variable -
+			 *            variable to change display label in legends
+			 * @param legend - new legend name
+			 */
+			setLegend : function(variable, legend){
+				var labelsMap = this.labelsMap;
 				
+				//set label legends to shorter label
+				this.options.legend = {
+						labelFormatter: function(label, series){
+							var shortLabel;
+							if(variable.getInstancePath() != label){
+								shortLabel = labelsMap[label].label;
+							}
+							else{
+								shortLabel = legend;
+								labelsMap[label].label = shortLabel;
+							}
+							return '<div class="legendLabel" id="'+label+'" title="'+label+'">'+shortLabel+'</div>';
+		        	}
+		        };
+				
+				this.plot = $.plot($("#" + this.id), this.datasets,this.options);
+				
+				//fix conflict between jquery and bootstrap tooltips
+				$.widget.bridge('uitooltip', $.ui.tooltip);
+				
+				//show tooltip for legends
+				$(".legendLabel").tooltip();
 			},
 
 			/**
@@ -43708,6 +43733,7 @@ define('nodes/AspectNode',['require','nodes/Node','jquery'],function(require) {
 		ModelTree : {},
 		VisualizationTree : {},
 		SimulationTree : {},
+		parentEntity : null,
 		initialize : function(options){
 			this.id = options.id;
 			this.modelInterpreterName = options.modelInterpreter;
@@ -43770,13 +43796,17 @@ define('nodes/AspectNode',['require','nodes/Node','jquery'],function(require) {
      	   
      	   if(GEPPETTO.unselectAspect(this.instancePath)){
      		   message = GEPPETTO.Resources.UNSELECTING_ASPECT + this.instancePath;
+     		   this.selected = false;
+
+     		   this.parentEntity.selected = false;
+
+     		   GEPPETTO.WidgetsListener.update(GEPPETTO.WidgetsListener.WIDGET_EVENT_TYPE.SELECTION_CHANGED);
      	   }
      	   else{
      		   message = GEPPETTO.Resources.ASPECT_NOT_SELECTED;
      	   }
-     	   this.selected = false;
      	   
-			   return message;
+		   return message;
         },
 
         /**
@@ -43791,11 +43821,15 @@ define('nodes/AspectNode',['require','nodes/Node','jquery'],function(require) {
 
         	if(GEPPETTO.selectAspect(this.instancePath)){
         		message = GEPPETTO.Resources.SELECTING_ASPECT + this.instancePath;
+            	this.selected = true;
+            	
+            	this.parentEntity.selected = true;
+
+     		   GEPPETTO.WidgetsListener.update(GEPPETTO.WidgetsListener.WIDGET_EVENT_TYPE.SELECTION_CHANGED);
         	}
         	else{
         		message = GEPPETTO.Resources.ASPECT_ALREADY_SELECTED;
         	}
-        	this.selected = true;
 
         	return message;
         },
@@ -43876,6 +43910,14 @@ define('nodes/AspectNode',['require','nodes/Node','jquery'],function(require) {
 				 return GEPPETTO.Resources.RETRIEVING_SIMULATION_TREE + "\n" + formattedNode;
 			 }       	   
 		 },
+		 
+		 getParentEntity : function(){
+			 return this.parentEntity;
+		 },
+		 
+		 setParentEntity : function(e){
+			 this.parentEntity = e;
+		 },
 	});
 });
 
@@ -43952,8 +43994,6 @@ define('nodes/EntityNode',['require','nodes/Node','nodes/AspectNode','jquery'],f
 		        	   this.position = options.position;
 		        	   this.instancePath = options.instancePath;
 		        	   this.aspects = this.get("aspects").models;
-		        	   this.selected = options.selected;
-		        	   this.visible = options.visible;
 		           },
 
 		           /**
@@ -43987,11 +44027,11 @@ define('nodes/EntityNode',['require','nodes/Node','nodes/AspectNode','jquery'],f
 		        	   
 		        	   if(GEPPETTO.showEntity(this.instancePath)){
 		        		   message = GEPPETTO.Resources.SHOW_ENTITY + this.instancePath;
+			        	   this.visible = true;
 		        	   }
 		        	   else{
 		        		   message = GEPPETTO.Resources.ENTITY_ALREADY_VISIBLE;
 		        	   }
-		        	   this.visible = true;
 		        	   
 					   return message;
 		        	   						
@@ -44008,14 +44048,14 @@ define('nodes/EntityNode',['require','nodes/Node','nodes/AspectNode','jquery'],f
 		        	   
 		        	   if(GEPPETTO.unselectEntity(this.instancePath)){
 		        		   message = GEPPETTO.Resources.UNSELECTING_ENTITY + this.instancePath;
-		        		   
+			        	   this.selected = false;
+
 		        		 //Notify any widgets listening that there has been a changed to selection 
 		        		   GEPPETTO.WidgetsListener.update(GEPPETTO.WidgetsListener.WIDGET_EVENT_TYPE.SELECTION_CHANGED);
 		        	   }
 		        	   else{
 		        		   message = GEPPETTO.Resources.ENTITY_NOT_SELECTED;
 		        	   }
-		        	   this.selected = false;
 		        	   
 					   return message;
 		           },
@@ -44032,6 +44072,7 @@ define('nodes/EntityNode',['require','nodes/Node','nodes/AspectNode','jquery'],f
 		        	   
 		        	   if(GEPPETTO.selectEntity(this.instancePath)){
 		        		   message = GEPPETTO.Resources.SELECTING_ENTITY + this.instancePath;
+			        	   this.selected = true;
 		        		   
 		        		   //Notify any widgets listening that there has been a changed to selection 
 		        		   GEPPETTO.WidgetsListener.update(GEPPETTO.WidgetsListener.WIDGET_EVENT_TYPE.SELECTION_CHANGED);
@@ -44039,7 +44080,6 @@ define('nodes/EntityNode',['require','nodes/Node','nodes/AspectNode','jquery'],f
 		        	   else{
 		        		   message = GEPPETTO.Resources.ENTITY_ALREADY_SELECTED ;
 		        	   }
-		        	   this.selected = true;
 		        	   
 					   return message;
 					},
@@ -44792,8 +44832,9 @@ define('nodes/RuntimeTreeFactory',['require','nodes/AspectNode','nodes/EntityNod
 													aspect.SimulationTree.modified = true;
 												}
 												if(nodeA.ModelTree.modified){
-													this.updateAspectSimulationTree(aspect.instancePath,nodeA.SimulationTree);
-													aspect.ModelTree.modified = true;
+													/*Do nothing, should never be true. Model Tree is created upon 
+													 * request by using Entity.aspect.getModelTree() command 
+													 */
 												}
 											}
 										}
@@ -45056,6 +45097,7 @@ define('nodes/RuntimeTreeFactory',['require','nodes/AspectNode','nodes/EntityNod
 							e[id] =aspectNode;
 							//add aspect node to entity
 							e.get("aspects").add(aspectNode);
+							aspectNode.setParentEntity(e);
 						}
 					}
 
