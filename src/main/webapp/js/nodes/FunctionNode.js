@@ -45,7 +45,6 @@ define(function(require) {
 	return Node.Model.extend({
 		arguments : "",
 		expression : "",
-		_metaType : "FunctionNode",
 
 		/**
 		 * Initializes this node with passed attributes
