@@ -332,6 +332,23 @@ define(function(require) {
 				},
 
 				/**
+				 * Write Model for this aspect
+				 * 
+				 * @command AspectNode.writeModel(format)
+				 * * @param {String} name - File format to write
+				 */
+				writeModel : function(format) {
+					//TODO: Change for inbound_messages_types
+					var parameters = {};
+					parameters["instancePath"] = this.instancePath;
+					parameters["format"] = format;
+					GEPPETTO.MessageSocket.send("write_model",
+								parameters);
+
+					return GEPPETTO.Resources.WRITING_MODEL + format;
+				},
+				
+				/**
 				 * Print out formatted node
 				 */
 				print : function() {
