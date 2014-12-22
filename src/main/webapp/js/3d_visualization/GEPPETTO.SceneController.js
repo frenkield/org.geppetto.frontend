@@ -231,14 +231,10 @@ define(function(require) {
 					var aabbMin = null;
 					var aabbMax = null;
 
-					for(var p in paths){
-						var mesh = GEPPETTO.getVARS().meshes[paths[p]];
-
-						mesh.traverse(function(child) {
+						GEPPETTO.getVARS().scene.traverse(function(child) {
 							if (child instanceof THREE.Mesh
 									|| child instanceof THREE.ParticleSystem) {
-								child.geometry.computeBoundingBox();
-
+								if(paths.contains(child.instancePath)){
 								child.geometry.computeBoundingBox();
 
 								// If min and max vectors are null, first values become
@@ -264,8 +260,8 @@ define(function(require) {
 											mesh.geometry.boundingBox.max.z);
 								}
 							}
+							}
 						});
-					}
 					// Compute world AABB center
 					GEPPETTO.getVARS().sceneCenter.x = (aabbMax.x + aabbMin.x) * 0.5;
 					GEPPETTO.getVARS().sceneCenter.y = (aabbMax.y + aabbMin.y) * 0.5;
@@ -367,12 +363,57 @@ define(function(require) {
 					}
 				},
 
-				showConnectionLines : function(from,to){
+				showConnectionLines : function(path,lines){					
+					var segments = Object.keys(lines).length;
 
+					var origin = GEPPETTO.getVARS().meshes[path].position;
+					var geometry = new THREE.Geometry();
+
+					var vertexColorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+
+					for ( var aspectPath in lines ) {
+						var type = lines[aspectPath];
+						var mesh = GEPPETTO.getVARS().meshes[aspectPath];
+						
+						geometry.vertices.push(origin, mesh.position );
+						
+						var color = new THREE.Color();
+						if(type==GEPPETTO.Resources.INPUT_CONNECTION){
+							//figure out if connection is both, input and output
+							if(mesh.output){
+								color.setHex(GEPPETTO.Resources.COLORS.INPUT_AND_OUTPUT);
+								geometry.colors.push(color);
+							}else{
+								color.setHex(GEPPETTO.Resources.COLORS.INPUT_TO_SELECTED);
+								geometry.colors.push(color);
+							}
+						}else if(type == GEPPETTO.Resources.OUTPUT_CONNECTION){
+							//figure out if connection is both, input and output
+							if(mesh.input){
+								color.setHex(GEPPETTO.Resources.COLORS.INPUT_AND_OUTPUT);
+								geometry.colors.push(color);
+							}
+							else{
+								color.setHex(GEPPETTO.Resources.COLORS.OUTPUT_TO_SELECTED);
+								geometry.colors.push(color);
+							}
+						}
+					
+					}
+
+					geometry.computeBoundingSphere();
+
+					line = new THREE.Line( geometry, vertexColorMaterial, THREE.LinePieces );
+					GEPPETTO.getVARS().scene.add(line);
+					
+					GEPPETTO.getVARS().connectionLines[path] = line;
 				},
 
-				hideConnectionLines : function(from, to){
-
+				hideConnectionLines : function(){
+					var lines = GEPPETTO.getVARS().connectionLines;
+					for(line in lines){
+						GEPPETTO.getVARS().scene.remove(lines[line]);
+					}
 				},
 
 				splitHighlightedMesh : function(targetObjects,aspects){
