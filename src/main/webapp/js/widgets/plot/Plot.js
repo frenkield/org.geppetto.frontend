@@ -124,6 +124,23 @@ define(function(require) {
 	        		return '<div class="legendLabel" id="'+label+'" title="'+label+'">'+shortLabel+'</div>';
 	        	});
 		        
+	        	/*
+	        	var lineChartData = [
+	        	                     // First series
+	        	                     {
+	        	                       label: "Series 1",
+	        	                       values: [ {time: 1370044800, y: 100}, {time: 1370044801, y: 1000}, ... ]
+	        	                     },
+
+	        	                     // The second series
+	        	                     {
+	        	                       label: "Series 2",
+	        	                       values: [ {time: 1370044800, y: 78}, {time: 1370044801, y: 98}, ... ]
+	        	                     },
+
+	        	                     ...
+	        	                   ];*/
+	        	
 				if (state!= null) {					
 					if(state instanceof Array){
 						this.datasets.push({
@@ -138,18 +155,18 @@ define(function(require) {
 						this.datasets.push({
 							label : id,
 							variable : state,
-							data : [ [0,value] ]
+							values : [ {time:0,y:value} ]
 						});						
 					}
 				}
 
 				var plotHolder = $("#" + this.id);
 				if(this.plot == null) {
-					this.plot = $.plot(plotHolder, this.datasets, this.options);
+					this.plot = $(plotHolder).epoch({ type: 'time.line', data: this.datasets });
 					plotHolder.resize();
 				}
 				else {
-					this.plot = $.plot(plotHolder, this.datasets, this.options);
+					this.plot = $(plotHolder).epoch({ type: 'time.line', data: this.datasets });
 				}
 				
 				return "Line plot added to widget";
@@ -233,6 +250,8 @@ define(function(require) {
 			 * Updates a data set, use for time series
 			 */
 			updateDataSet: function() {
+		        var entry = [];
+
 				for(var key in this.datasets) {
 					var newValue = this.datasets[key].variable.getValue();
 
@@ -250,16 +269,17 @@ define(function(require) {
 						}
 					}
 
-					var oldata = this.datasets[key].data;;
+					var oldata = this.datasets[key].values;
+					/*
 					var reIndex = false;
 
 					if(oldata.length > this.limit) {
 						oldata.splice(0, 1);
 						reIndex = true;
-					}
+					}*/
 
-					oldata.push([ oldata.length, newValue]);
-
+			            entry.push({ time: oldata.length, y: newValue });
+					/*
 					if(reIndex) {
 						// re-index data
 						var indexedData = [];
@@ -273,12 +293,12 @@ define(function(require) {
 					else {
 						this.datasets[key].data = oldata;
 					}
-
+					 */
 				}
 
 				if(this.plot != null){
-					this.plot.setData(this.datasets);
-					this.plot.draw();
+					
+					this.plot.push(entry);
 				}
 			},
 

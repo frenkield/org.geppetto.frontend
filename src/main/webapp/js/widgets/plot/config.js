@@ -46,8 +46,8 @@ require.config({
 	 * E.G. If depenedency it's used more than once, it goes in here.
 	 */
 	paths : {
-		'flot' :"widgets/plot/vendor/jquery.flot.min",
-		'mathjs' :"widgets/plot/vendor/math.min", 
+		d3 :"widgets/plot/vendor/d3.min",
+		'mathjs' :"widgets/plot/vendor/math.min",
 	},
 	/*
 	 * Notes what dependencies are needed prior to loading each library, values on the right
@@ -55,8 +55,7 @@ require.config({
 	 * to that object in here.
 	 */
 	shim: {
-		"widgets/plot/vendor/jquery.flot.resize.min" : ["flot"],
-		"widgets/plot/vendor/jquery.flot.axislabels.min" : ["flot"]
+		"widgets/plot/vendor/epoch.min" : ["d3"]
 	}
 });
 
@@ -64,10 +63,14 @@ require.config({
  * Libraries used by plot widget
  */
 var libraries = [];
-libraries.push("flot");
+libraries.push("d3");
 libraries.push("mathjs");
-libraries.push("widgets/plot/vendor/jquery.flot.resize.min");
-libraries.push("widgets/plot/vendor/jquery.flot.axislabels.min");
+
+
+define("d3.global", ["d3"], function(_) {
+	  d3 = _;
+	});
+
 
 define("math.global", ["mathjs"], function(_) {
 	  math = _;
@@ -76,9 +79,11 @@ define("math.global", ["mathjs"], function(_) {
 /*
  * Load libraries, and CSS after libraries are loaded
  */
-require(libraries,function(flot, math){
+require(libraries,function(d3, math){
 //	console.log(math.parser());
 	window.math = math;
+	window.d3 = d3;
+	loadCss("assets/js/widgets/plot/vendor/epoch.min.css");
 	loadCss("assets/js/widgets/plot/Plot.css");
 });	
 
