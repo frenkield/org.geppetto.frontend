@@ -116,6 +116,24 @@ define(function(require) {
 					}
 				},
 				
+				generate3DObjects : function(aspect) {
+
+					var materials = {
+							"mesh": GEPPETTO.SceneFactory.getMeshPhongMaterial(),
+							"particle": GEPPETTO.SceneFactory.getParticleMaterial()
+					};
+					var aspectObjects = [];
+					threeDeeObjList = GEPPETTO.SceneFactory.walkVisTreeGen3DObjs(aspect.VisualizationTree.content, materials);
+
+					if(threeDeeObjList.length > 0){
+						var mergedObjs = GEPPETTO.SceneFactory.merge3DObjects(threeDeeObjList, materials);
+						//investigate need to obj.dispose for obj in threeDeeObjList
+						mergedObjs.aspectInstancePath = aspect.instancePath;
+						aspectObjects.push(mergedObjs);
+					}
+
+					return aspectObjects;
+				},
 
 				generate3DObjects : function(aspect) {
 
@@ -308,9 +326,12 @@ define(function(require) {
 					var midPoint = new THREE.Vector3();
 					midPoint.addVectors(bottomBasePos, topBasePos).multiplyScalar(0.5);
 
-					var c = new THREE.CylinderGeometry(cylNode.radiusTop,
-							cylNode.radiusBottom,
-							axis.length(), 6, 1, false);
+					//convert radius values to float from string
+					var bottom = parseFloat(cylNode.radiusBottom);
+					var top = parseFloat(cylNode.radiusTop);
+					
+					var c = new THREE.CylinderGeometry(top,
+												bottom,axis.length(), 6, 1, false);
 					c.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 					var threeObject = new THREE.Mesh(c, material);
 

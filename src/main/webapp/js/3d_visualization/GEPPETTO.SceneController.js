@@ -141,16 +141,18 @@ define(function(require) {
 					for ( var v in GEPPETTO.getVARS().meshes) {
 						if(v == instancePath){
 							var mesh = GEPPETTO.getVARS().meshes[v];
-							if(!mesh.visible){
-								GEPPETTO.SceneController.merge(instancePath);
+							if(mesh!=null || undefined){
+								if(!mesh.visible){
+									GEPPETTO.SceneController.merge(instancePath);
+								}
+								if(mesh.selected == false){
+									mesh.material.color.setHex(GEPPETTO.Resources.COLORS.SELECTED);
+									mesh.material.opacity = GEPPETTO.Resources.OPACITY.DEFAULT;
+									mesh.selected = true;
+									mesh.ghosted = false;
+									return true;
+								}
 							}
-							if(mesh.selected == false){
-								mesh.material.color.setHex(GEPPETTO.Resources.COLORS.SELECTED);
-								mesh.material.opacity = GEPPETTO.Resources.OPACITY.DEFAULT;
-								mesh.selected = true;
-								mesh.ghosted = false;
-								return true;
-							}					
 						}
 					}
 					return false;
@@ -382,6 +384,7 @@ define(function(require) {
 					var segments = Object.keys(lines).length;
 
 					var mesh = GEPPETTO.getVARS().meshes[path];
+					mesh.geometry.computeBoundingBox();
 					var origin = mesh.geometry.boundingBox.center();
 					origin = mesh.localToWorld(origin);
 					
@@ -389,6 +392,7 @@ define(function(require) {
 						
 						var type = lines[aspectPath];
 						var destinationMesh = GEPPETTO.getVARS().meshes[aspectPath];
+						destinationMesh.geometry.computeBoundingBox();
 						var destination =
 							destinationMesh.geometry.boundingBox.center();
 						destination = destinationMesh.localToWorld(destination);
