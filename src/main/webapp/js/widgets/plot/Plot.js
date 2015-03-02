@@ -42,37 +42,23 @@ define(function(require) {
 
 	return Widget.View.extend({
 			plot: null,
-			datasets: [],
-			limit: 20,
+			limit: 1600,
 			options: null,
 			xaxisLabel: null,
 			yaxisLabel: null,
 			labelsUpdated: false,
 			labelsMap : {},
+			datasets : [],
 
 			/**
 			 * Default options for plot widget, used if none specified when plot
 			 * is created
 			 */
 			defaultPlotOptions:  {
-				series: {
-					shadowSize: 0
-				},
-				yaxis: {
-					min: -0.1,
-					max: 1
-				},
-				xaxis: {
-					min: 0,
-					max: 20,
-					show: false
-				},
-				grid: {
-					margin: {
-						left: 15,
-						bottom: 15
-					}
-				},
+				axes: ['right', 'bottom'],
+				tickFormats: { time: function() {return ".5";} },
+				ticks: { time: 10, right: 3},
+				historySize : 10,
 			},
 
 			/**
@@ -87,7 +73,7 @@ define(function(require) {
 				this.datasets = [];
 				this.options = this.defaultPlotOptions;
 				this.render();
-				this.dialog.append("<div class='plot' id='" + this.id + "'></div>");		
+				$("#"+this.id).addClass("epoch");
 				
 				//fix conflict between jquery and bootstrap tooltips
 				$.widget.bridge('uitooltip', $.ui.tooltip);
@@ -102,7 +88,7 @@ define(function(require) {
 			 * plotData(object) Multiples arrays can be specified at once in
 			 * this method, but only one object at a time.
 			 *
-			 * @command plotData(state, options)
+			 * @command plotDataset(state, options)
 			 * @param {Object} state - series to plot, can be array of data or an geppetto simulation variable
 			 * @param {Object} options - options for the plotting widget, if null uses default
 			 */
@@ -111,45 +97,34 @@ define(function(require) {
 				// If no options specify by user, use default options
 				if(options != null) {
 					this.options = options;
-					if(this.options.xaxis.max > this.limit) {
-						this.limit = this.options.xaxis.max;
-					}
 				}
 
-				var labelsMap = this.labelsMap;
-	        	this.initializeLegend(function(label, series){
-	        		var split = label.split(".");
-					var shortLabel = split[0] +"."+split[1]+"....." + split[split.length-1];
-					labelsMap[label] = {label : shortLabel};
-	        		return '<div class="legendLabel" id="'+label+'" title="'+label+'">'+shortLabel+'</div>';
-	        	});
-		        
 				if (state!= null) {					
-					if(state instanceof Array){
-						this.datasets.push({
-							data : state
-						});
-					}
-					
-					else{
-						var value = state.getValue();
-						var id = state.getInstancePath();
-						
-						this.datasets.push({
+					var value = state.getValue();
+					var id = state.getInstancePath();
+
+					var t = GEPPETTO.Simulation.getTime().getValue();
+					var nextSet ={
 							label : id,
 							variable : state,
-							data : [ [0,value] ]
-						});						
-					}
-				}
+							values : [{time: t,y: value}],
+					};
+					this.datasets.push(nextSet);						
 
-				var plotHolder = $("#" + this.id);
-				if(this.plot == null) {
-					this.plot = $.plot(plotHolder, this.datasets, this.options);
-					plotHolder.resize();
-				}
-				else {
-					this.plot = $.plot(plotHolder, this.datasets, this.options);
+					var plotHolder = $("#" + this.id);
+					if(this.plot == null) {
+						this.plot = $("#" + this.id).epoch({
+							type: 'time.line',
+							data: this.datasets,
+							axes : this.options.axes,
+							ticks : this.options.ticks,
+							tickFormats : this.options.tickFormats,
+							historySize : 1600,
+						});
+					}
+					else {
+						this.plot.update(this.datasets);
+					}
 				}
 				
 				return "Line plot added to widget";
@@ -233,52 +208,18 @@ define(function(require) {
 			 * Updates a data set, use for time series
 			 */
 			updateDataSet: function() {
+				var newData = [];
 				for(var key in this.datasets) {
 					var newValue = this.datasets[key].variable.getValue();
 
-					if(!this.labelsUpdated) {
-						var unit = this.datasets[key].variable.getUnit();
-						if(unit != null) {
-							var labelY = unit;
-							//Matteo: commented until this can move as it doesn't make sense for it to be static.
-							//also ms should not be harcoded but should come from the simulator as the timescale could
-							//be different
-							var labelX = "";
-							//Simulation timestep (ms) " + Simulation.timestep;
-							this.setAxisLabel(labelY, labelX);
-							this.labelsUpdated = true;
-						}
-					}
+					var t = GEPPETTO.Simulation.getTime().getValue();
 
-					var oldata = this.datasets[key].data;;
-					var reIndex = false;
-
-					if(oldata.length > this.limit) {
-						oldata.splice(0, 1);
-						reIndex = true;
-					}
-
-					oldata.push([ oldata.length, newValue]);
-
-					if(reIndex) {
-						// re-index data
-						var indexedData = [];
-						for(var index = 0, len = oldata.length; index < len; index++) {
-							var value = oldata[index][1];
-							indexedData.push([ index, value ]);
-						}
-
-						this.datasets[key].data = indexedData;
-					}
-					else {
-						this.datasets[key].data = oldata;
-					}
-
+					newData.push({ time : t, y: newValue});
 				}
 
 				if(this.plot != null){
-					this.plot.setData(this.datasets);
-					this.plot.draw();
+					//this.plot.push(this.datasets);
+					this.plot.push(newData);
 				}
 			},
 
@@ -354,13 +295,13 @@ define(function(require) {
 			 * @param {Object} options - options to modify the plot widget
 			 */
 			setOptions: function(options) {
-				this.options = options;
-				if(this.options.xaxis != null) {
-					if(this.options.xaxis.max > this.limit) {
-						this.limit = this.options.xaxis.max;
-					}
-				}
-				this.plot = $.plot($("#" + this.id), this.datasets, this.options);
+//				this.options = options;
+//				if(this.options.xaxis != null) {
+//					if(this.options.xaxis.max > this.limit) {
+//						this.limit = this.options.xaxis.max;
+//					}
+//				}
+//				this.plot = $.plot($("#" + this.id), datasets, this.options);
 			},
 			
 			/**
