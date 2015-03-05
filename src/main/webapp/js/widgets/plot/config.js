@@ -55,7 +55,7 @@ require.config({
 	 * to that object in here.
 	 */
 	shim: {
-		"widgets/plot/vendor/epoch.min" : ["d3"],
+		"widgets/plot/vendor/epoch" : ["d3"],
 	}
 });
 
@@ -64,7 +64,7 @@ require.config({
  */
 var libraries = [];
 libraries.push("d3");
-libraries.push("widgets/plot/vendor/epoch.min");
+libraries.push("widgets/plot/vendor/epoch");
 libraries.push("mathjs");
 
 define("math.global", ["mathjs"], function(_) {

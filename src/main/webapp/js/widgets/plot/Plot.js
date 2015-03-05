@@ -56,7 +56,7 @@ define(function(require) {
 			 */
 			defaultPlotOptions:  {
 				axes: ['right', 'bottom'],
-				tickFormats: { time: function() {return ".5";} },
+				tickFormats: { time: function(d) {return ".5";} },
 				ticks: { time: 10, right: 3},
 				historySize : 10,
 			},
@@ -93,12 +93,6 @@ define(function(require) {
 			 * @param {Object} options - options for the plotting widget, if null uses default
 			 */
 			plotData: function(state, options) {
-
-				// If no options specify by user, use default options
-				if(options != null) {
-					this.options = options;
-				}
-
 				if (state!= null) {					
 					var value = state.getValue();
 					var id = state.getInstancePath();
@@ -118,7 +112,12 @@ define(function(require) {
 							data: this.datasets,
 							axes : this.options.axes,
 							ticks : this.options.ticks,
-							tickFormats : this.options.tickFormats,
+							tickFormats : {bottom:function(d) {
+							    return Math.round(d*10000)/10000 + 
+							    		GEPPETTO.Simulation.getTime().unit;
+							  }, right :function(d) {
+								    return Math.round(d*10000)/10000;
+							  }},
 							historySize : 1600,
 						});
 					}
