@@ -57,7 +57,8 @@ require.config({
 		react: 'vendor/react',
 		jsx: 'vendor/jsx',
         JSXTransformer: 'vendor/JSXTransformer',
-        text: 'vendor/text'
+        text: 'vendor/text',
+		pako: 'vendor/pako.min'
 	},
 	/*
 	 * Notes what dependencies are needed prior to loading each library, values on the right

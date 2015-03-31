@@ -92,6 +92,8 @@ public class GeppettoServletController {
 
 	private boolean _simulationInUse = false;
 
+    private MessageSenderService messageSenderService = new MessageSenderService();
+
 	protected GeppettoServletController() {
 		SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
 
@@ -661,7 +663,7 @@ public class GeppettoServletController {
 		String msg = new Gson().toJson(transportMsg);
 
 		// Send the message to the client
-		sendMessage(connection, msg);
+        messageSenderService.sendMessage(connection, msg);
 	}
 
 	/**
@@ -675,35 +677,26 @@ public class GeppettoServletController {
 	public void messageClient(String requestID,
 			GeppettoMessageInbound connection, OUTBOUND_MESSAGE_TYPES type,
 			String update) {
-		// get transport message to be sent to the client
-		GeppettoTransportMessage transportMsg = TransportMessageFactory.getTransportMessage(requestID, type, update);
-		String msg = new Gson().toJson(transportMsg);
 
-		sendMessage(connection, msg);
+
+        long start = System.currentTimeMillis();
+
+        messageSenderService.sendMessage(connection, requestID, type, update);
+
+
+//
+//
+//
+//        // get transport message to be sent to the client
+//		GeppettoTransportMessage transportMsg = TransportMessageFactory.getTransportMessage(requestID, type, update);
+//		String msg = new Gson().toJson(transportMsg);
+
+
+        _logger.info("---------------- " + (System.currentTimeMillis() - start));
+
+
 	}
 
-	/**
-	 * Sends a message to a specific user. The id of the WebSocket connection is
-	 * used to contact the desired user.
-	 * 
-	 * @param id - ID of WebSocket connection that will be sent a message
-	 * @param msg - The message the user will be receiving
-	 */
-	public void sendMessage(GeppettoMessageInbound visitor, String msg) {
-		try {
-			long startTime = System.currentTimeMillis();
-			CharBuffer buffer = CharBuffer.wrap(msg);
-			visitor.getWsOutbound().writeTextMessage(buffer);
-			String debug = ((long) System.currentTimeMillis() - startTime)
-					+ "ms were spent sending a message of " + msg.length()
-					/ 1024 + "KB to the client";
-			_logger.info(debug);
-		} catch (IOException ignore) {
-			_logger.error("Unable to communicate with client "
-					+ ignore.getMessage());
-			this.removeConnection(visitor);
-		}
-	}
 
 	/**
 	 * Returns status of server simulation used

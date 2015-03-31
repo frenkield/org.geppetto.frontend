@@ -9,8 +9,42 @@
 	<properties>
         <contextPath>org.geppetto.frontend</contextPath>
         <spring.version>3.1.0.RELEASE</spring.version>
+        <artifactFilename>
+            ${project.build.directory}/${project.groupId}.${project.artifactId}.${project.packaging}
+        </artifactFilename>
+        <geppetto.home>/Users/frenkield/projects/openworm/geppetto/webapp/geppetto</geppetto.home>
     </properties>
     <profiles>
+
+
+        <profile>
+            <id>virgo-install</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="deploying to virgo" />
+                                        <copy file="${artifactFilename}" todir="${geppetto.home}/repository/usr" />
+                                        <touch file="${geppetto.home}/pickup/geppetto.plan" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
         <profile>
             <id>master</id>
             <properties>
@@ -369,6 +403,7 @@
 				<artifactId>jsdoc3-maven-plugin</artifactId>
 				<version>1.1.0</version>
 				<configuration>
+                    <skip>true</skip>
 					<recursive>true</recursive>
 					<directoryRoots>
 						<directoryRoot>${basedir}/src/main/webapp/js/geppetto-objects</directoryRoot>

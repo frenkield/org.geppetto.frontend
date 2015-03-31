@@ -60,6 +60,7 @@ define(function(require) {
 			connect: function(host) {
 				if('WebSocket' in window) {
 					GEPPETTO.MessageSocket.socket = new WebSocket(host);
+					GEPPETTO.MessageSocket.socket.binaryType = "arraybuffer";
 				}
 				else if('MozWebSocket' in window) {
 					GEPPETTO.MessageSocket.socket = new MozWebSocket(host);
@@ -85,10 +86,18 @@ define(function(require) {
 				};
 
 				GEPPETTO.MessageSocket.socket.onmessage = function(msg) {
+
 					if(msg.data=="ping"){
 						return;
 					}
-					var parsedServerMessage = JSON.parse(msg.data);
+
+					var messageData = msg.data;
+
+					if (msg.data instanceof ArrayBuffer) {
+						messageData = uncompressMessage(msg.data);
+					}
+
+					var parsedServerMessage = JSON.parse(messageData);
 
 					//notify all handlers
 					for(var i = 0, len = messageHandlers.length; i < len; i++) {
@@ -211,7 +220,22 @@ define(function(require) {
 				data: payload
 			};
 			return  JSON.stringify(object);
-		};
+		}
+
+		function uncompressMessage(compressedMessage) {
+
+			console.log("************* uncompressing message", compressedMessage.size);
+
+			var pako = require("pako");
+
+			console.log("********* pako = ", pako);
+
+			var messageBytes = new Uint8Array(compressedMessage);
+
+			var message = pako.ungzip(messageBytes);
+
+			return compressedMessage;
+		}
 
 	}
 });
