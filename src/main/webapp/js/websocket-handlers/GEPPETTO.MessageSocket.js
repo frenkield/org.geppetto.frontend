@@ -100,8 +100,8 @@ define(function(require) {
 					var parsedServerMessage = JSON.parse(messageData);
 
 					//notify all handlers
-					for(var i = 0, len = messageHandlers.length; i < len; i++) {
-						messageHandlers[ i ].onMessage(parsedServerMessage);
+					for (var i = 0, len = messageHandlers.length; i < len; i++) {
+						messageHandlers[i].onMessage(parsedServerMessage);
 					}
 				};
 
@@ -223,18 +223,10 @@ define(function(require) {
 		}
 
 		function uncompressMessage(compressedMessage) {
-
-			console.log("************* uncompressing message", compressedMessage.size);
-
 			var pako = require("pako");
-
-			console.log("********* pako = ", pako);
-
 			var messageBytes = new Uint8Array(compressedMessage);
-
-			var message = pako.ungzip(messageBytes);
-
-			return compressedMessage;
+			var message = pako.ungzip(messageBytes, {to:"string"});
+			return message;
 		}
 
 	}
