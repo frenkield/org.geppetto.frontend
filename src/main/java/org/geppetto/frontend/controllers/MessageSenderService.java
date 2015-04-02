@@ -133,6 +133,7 @@ public class MessageSenderService {
         private OUTBOUND_MESSAGE_TYPES type;
         private String update;
         private CompressionUtils compressionUtils = new CompressionUtils();
+        boolean useCompression = false;
 
         public Preprocessor(GeppettoMessageInbound visitor, String requestId, OUTBOUND_MESSAGE_TYPES type,
                             String update) throws IOException {
@@ -165,7 +166,7 @@ public class MessageSenderService {
                 logger.info(String.format("******* created json in %dms", elapsedTime));
 
 
-                if (message.length() < 1000) {
+                if (!useCompression || message.length() < 1000) {
                     senderExecutor.execute(new MessageSender(visitor, message));
 
                 } else {
