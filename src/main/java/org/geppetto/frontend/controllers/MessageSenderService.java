@@ -202,14 +202,13 @@ public class MessageSenderService {
                     byteBuffer.putDouble(particle);
                 }
 
-
                 byte[] compressedMessage = compressionUtils.compressMessageBinary(byteBuffer.array());
                 ByteBuffer compressedByteBuffer = ByteBuffer.wrap(compressedMessage);
                 logger.info("********************** " + compressedMessage.length);
 
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                logger.info(String.format("******* created particle byte buffer in %dms", elapsedTime));
+                logger.info(String.format("******* compressed and created particle byte buffer in %dms", elapsedTime));
 
                 senderExecutor.execute(new BinaryMessageSender(visitor, compressedByteBuffer));
 
