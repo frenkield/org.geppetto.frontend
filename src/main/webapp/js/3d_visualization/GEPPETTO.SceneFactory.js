@@ -197,11 +197,30 @@ define(function(require) {
 					threeDeeObjList = GEPPETTO.SceneFactory.walkVisTreeGen3DObjs(aspect.VisualizationTree.content, materials);
 
 					//only merge if there are more than one object
-					if(threeDeeObjList.length > 1){
+					if(threeDeeObjList.length > 1) {
+
+
+
 						var mergedObjs = GEPPETTO.SceneFactory.merge3DObjects(threeDeeObjList, materials);
+
 						//investigate need to obj.dispose for obj in threeDeeObjList
-						mergedObjs.aspectInstancePath = aspect.instancePath;
-						aspectObjects.push(mergedObjs);
+
+						if (mergedObjs instanceof Array) {
+
+							mergedObjs.forEach(function(mergedObj) {
+								mergedObj.aspectInstancePath = aspect.instancePath;
+								aspectObjects.push(mergedObj);
+							});
+
+
+						} else {
+							mergedObjs.aspectInstancePath = aspect.instancePath;
+							aspectObjects.push(mergedObjs);
+						}
+
+
+
+
 					}else if(threeDeeObjList.length == 1){
 						//only one object in list, add it to local array and set 
 						//instance path from aspect
@@ -260,24 +279,39 @@ define(function(require) {
 						ret = meshWithAll;
 						break;
 					case "ParticleNode":
-						var particleGeometry = new THREE.Geometry();
-						objArray.forEach(function(obj){
-							particleGeometry.vertices.push(obj);
+
+						var liquidParticleGeometry = new THREE.Geometry();
+						var elasticParticleGeometry = new THREE.Geometry();
+
+						objArray.forEach(function(obj) {
+
+							var material = "liquidParticle";
+
+							if (obj.instancePath.indexOf("LIQUID") >= 0) {
+								liquidParticleGeometry.vertices.push(obj);
+							} else {
+								elasticParticleGeometry.vertices.push(obj);
+							}
+
 							//TODO: do we want to store the path for each one of the nodes into mergedMeshesPaths?
 							//      it doesn't seem to be done correctly in the original code
 						});
 
-						//var material = "liquidParticle";
-						//
-						//if ()
 
-						var merged = new THREE.ParticleSystem(particleGeometry, materials["particle"]);
+						var mergedLiquid = new THREE.ParticleSystem(liquidParticleGeometry, materials["liquidParticle"]);
+						mergedLiquid.sortParticles = true;
+						mergedLiquid.geometry.verticesNeedUpdate = true;
+						mergedLiquid.mergedMeshesPaths = mergedMeshesPaths;
 
+						var mergedElastic = new THREE.ParticleSystem(elasticParticleGeometry, materials["elasticParticle"]);
+						mergedElastic.sortParticles = true;
+						mergedElastic.geometry.verticesNeedUpdate = true;
+						mergedElastic.mergedMeshesPaths = mergedMeshesPaths;
 
-						merged.sortParticles = true;
-						merged.geometry.verticesNeedUpdate = true;
-						ret = merged;
+						ret = [mergedLiquid, mergedElastic];
+
 						break;
+
 					case "ColladaNode":
 					case "OBJNode":
 						//TODO: can we have multiple collada / OBJ ? Do we merge them?
