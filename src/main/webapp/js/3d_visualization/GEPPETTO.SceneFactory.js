@@ -146,6 +146,12 @@ define(function(require) {
 
 					particleId = Math.abs(particleId);
 
+					// super hack to deal with zeroth particle...
+					if (particleId < 1) {
+						particleId = 0;
+					}
+
+
 					var instancePath =
 						"sample.fluid.VisualizationTree." + particleKind + "_sph.p[" + particleId + "]";
 
@@ -183,7 +189,9 @@ define(function(require) {
 
 					var materials = {
 							"mesh": GEPPETTO.SceneFactory.getMeshPhongMaterial(),
-							"particle": GEPPETTO.SceneFactory.getParticleMaterial()
+							"particle": GEPPETTO.SceneFactory.getParticleMaterial(GEPPETTO.Resources.COLORS.DEFAULT),
+							"liquidParticle": GEPPETTO.SceneFactory.getParticleMaterial(GEPPETTO.Resources.COLORS.DEFAULT),
+							"elasticParticle": GEPPETTO.SceneFactory.getParticleMaterial("0xff0000")
 					};
 					var aspectObjects = [];
 					threeDeeObjList = GEPPETTO.SceneFactory.walkVisTreeGen3DObjs(aspect.VisualizationTree.content, materials);
@@ -258,7 +266,14 @@ define(function(require) {
 							//TODO: do we want to store the path for each one of the nodes into mergedMeshesPaths?
 							//      it doesn't seem to be done correctly in the original code
 						});
+
+						//var material = "liquidParticle";
+						//
+						//if ()
+
 						var merged = new THREE.ParticleSystem(particleGeometry, materials["particle"]);
+
+
 						merged.sortParticles = true;
 						merged.geometry.verticesNeedUpdate = true;
 						ret = merged;
@@ -424,7 +439,7 @@ define(function(require) {
 					material.color.setHex(GEPPETTO.Resources.COLORS.DEFAULT);
 					return material;
 				},
-				getParticleMaterial : function(){
+				getParticleMaterial : function(color) {
 					var pMaterial = new THREE.PointCloudMaterial({
 						size : 5,
 						map : THREE.ImageUtils
@@ -433,7 +448,7 @@ define(function(require) {
 						depthTest : false,
 						transparent : true
 					});
-					pMaterial.color.setHex(GEPPETTO.Resources.COLORS.DEFAULT);
+					pMaterial.color.setHex(color);
 					pMaterial.opacity = GEPPETTO.Resources.OPACITY.DEFAULT;
 					return pMaterial;
 				}
