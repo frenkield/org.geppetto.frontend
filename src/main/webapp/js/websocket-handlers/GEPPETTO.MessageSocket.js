@@ -98,11 +98,10 @@ define(function(require) {
 						var messageData = uncompressMessage(msg.data);
 
 
-						var particles = new Float64Array(messageData.buffer);
+						var particlePositionsArray = new Float64Array(messageData.buffer);
 
 
-						console.log("*************", particles);
-
+						GEPPETTO.SimulationHandler.onParticlesUpdate(particlePositionsArray)
 
 
 					} else {

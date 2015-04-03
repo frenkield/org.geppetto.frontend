@@ -47,7 +47,13 @@ public class MessageSenderService {
                             String update) {
 
         try {
-            preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
+
+            if (!type.equals(OUTBOUND_MESSAGE_TYPES.SCENE_UPDATE)) {
+                preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
+            } else {
+                logger.info(")))))))))))))))) skipping update message - " + update.length());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

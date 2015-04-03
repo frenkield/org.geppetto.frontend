@@ -61,6 +61,15 @@ define(function(require) {
 					GEPPETTO.getVARS().scene.updateMatrixWorld(true);
 				},
 
+
+
+
+
+
+
+
+
+
 				/**
 				 * Updates the scene
 				 * @param {Object} newRuntimeTree - New update received to update the 3D scene
@@ -103,6 +112,10 @@ define(function(require) {
 				},
 
 
+
+
+
+
 				updateGeometry : function(g) {
 					var threeObject = GEPPETTO.getVARS().visualModelMap[g.instancePath];
 					if (threeObject) {
@@ -117,8 +130,45 @@ define(function(require) {
 						}
 					}
 				},
-				
-				generate3DObjects : function(aspect) {
+
+
+
+				updateParticlePosition : function(particlePositionsArray, particleIndex) {
+
+					var instancePath = "sample.fluid.VisualizationTree.ELASTIC_sph.p[" + particleIndex + "]";
+
+//					console.log("instance path = ", instancePath);
+
+
+					var threeObject = GEPPETTO.getVARS().visualModelMap[instancePath];
+
+//					console.log("three object = ", threeObject);
+
+
+					if (threeObject) {
+
+						var particlePositionsIndex = particleIndex * 3;
+
+						var x = particlePositionsArray[particlePositionsIndex];
+						var y = particlePositionsArray[particlePositionsIndex + 1];
+						var z = particlePositionsArray[particlePositionsIndex + 2];
+
+						if (threeObject instanceof THREE.Vector3) {
+							threeObject.x = x;
+							threeObject.y = y;
+							threeObject.z = z;
+						} else {
+							// update the position
+							threeObject.position.set(x, y, z);
+						}
+					}
+				},
+
+
+
+
+
+			generate3DObjects : function(aspect) {
 
 					var materials = {
 							"mesh": GEPPETTO.SceneFactory.getMeshPhongMaterial(),

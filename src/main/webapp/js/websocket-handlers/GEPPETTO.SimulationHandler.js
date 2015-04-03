@@ -225,6 +225,10 @@ define(function(require) {
         	}
         };
 
+
+
+
+
 		GEPPETTO.SimulationHandler = {
 			onMessage: function(parsedServerMessage) {
 				// parsed message has a type and data fields - data contains the payload of the message
@@ -232,11 +236,37 @@ define(function(require) {
                 if(messageHandler.hasOwnProperty(parsedServerMessage.type)) {
                     messageHandler[parsedServerMessage.type](JSON.parse(parsedServerMessage.data));
                 }
+			},
+
+			onParticlesUpdate: function(particlePositionsArray) {
+
+				var particleCount = particlePositionsArray.length / 3;
+
+				for (var i = 0; i < particleCount; i++) {
+
+					GEPPETTO.SceneFactory.updateParticlePosition(particlePositionsArray, i);
+
+				}
+
+
+
+
+
+
 			}
+
 		};
 
 		GEPPETTO.SimulationHandler.MESSAGE_TYPE = messageTypes;
 	};
+
+
+
+
+
+
+
+
 
 	/**
 	 * Utility function for formatting output of list variable operations
