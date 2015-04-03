@@ -30,4 +30,25 @@ public class CompressionUtils {
 
         return compressedMessage;
     }
+
+    public byte[] compressMessageBinary(byte[] message) throws IOException {
+
+        long startTime = System.currentTimeMillis();
+
+        ByteArrayOutputStream compressedMessageStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(compressedMessageStream);
+
+        gzipOutputStream.write(message);
+        gzipOutputStream.close();
+
+        byte[] compressedMessage = compressedMessageStream.toByteArray();
+        compressedMessageStream.close();
+
+        long elapsedTime = System.currentTimeMillis() - startTime;
+
+        logger.info(String.format("******* compressed message from %d to %d bytes in %dms", message.length,
+                compressedMessage.length, elapsedTime));
+
+        return compressedMessage;
+    }
 }

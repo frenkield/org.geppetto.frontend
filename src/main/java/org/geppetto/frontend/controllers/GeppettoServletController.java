@@ -697,6 +697,19 @@ public class GeppettoServletController {
 
 	}
 
+    public void messageClient(String requestID,
+                              GeppettoMessageInbound connection, OUTBOUND_MESSAGE_TYPES type,
+                              List<Double> particles) {
+
+
+        long start = System.currentTimeMillis();
+
+        messageSenderService.sendMessage(connection, requestID, type, particles);
+
+        _logger.info("---------------- " + (System.currentTimeMillis() - start));
+
+
+    }
 
 	/**
 	 * Returns status of server simulation used

@@ -91,17 +91,29 @@ define(function(require) {
 						return;
 					}
 
-					var messageData = msg.data;
 
 					if (msg.data instanceof ArrayBuffer) {
-						messageData = uncompressMessage(msg.data);
-					}
 
-					var parsedServerMessage = JSON.parse(messageData);
 
-					//notify all handlers
-					for (var i = 0, len = messageHandlers.length; i < len; i++) {
-						messageHandlers[i].onMessage(parsedServerMessage);
+						var messageData = uncompressMessage(msg.data);
+
+
+						var particles = new Float64Array(messageData.buffer);
+
+
+						console.log("*************", particles);
+
+
+
+					} else {
+
+						var messageData = msg.data;
+						var parsedServerMessage = JSON.parse(messageData);
+
+						//notify all handlers
+						for (var i = 0, len = messageHandlers.length; i < len; i++) {
+							messageHandlers[i].onMessage(parsedServerMessage);
+						}
 					}
 				};
 
@@ -225,7 +237,11 @@ define(function(require) {
 		function uncompressMessage(compressedMessage) {
 			var pako = require("pako");
 			var messageBytes = new Uint8Array(compressedMessage);
-			var message = pako.ungzip(messageBytes, {to:"string"});
+
+//			var message = pako.ungzip(messageBytes, {to:"string"});
+
+			var message = pako.ungzip(messageBytes);
+
 			return message;
 		}
 
