@@ -179,7 +179,7 @@ define(function(require) {
         	/ Math.sin(Math.PI / 180.0 * GEPPETTO.getVARS().camera.fov * 0.5);
         	
         	var dir = new THREE.Vector3(0, 0, 1);
-            dir.multiplyScalar(offset);
+            dir.multiplyScalar(offset * 10);
 
         	// Store camera position
         	GEPPETTO.getVARS().camera.position.addVectors(dir,GEPPETTO.getVARS().controls.target);
