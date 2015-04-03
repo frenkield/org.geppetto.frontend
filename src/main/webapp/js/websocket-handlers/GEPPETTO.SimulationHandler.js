@@ -240,7 +240,7 @@ define(function(require) {
 
 			onParticlesUpdate: function(particlePositionsArray) {
 
-				var particleCount = particlePositionsArray.length / 3;
+				var particleCount = particlePositionsArray.length / 4;
 
 				for (var i = 0; i < particleCount; i++) {
 

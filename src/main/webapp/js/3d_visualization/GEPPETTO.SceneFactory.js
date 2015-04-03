@@ -135,7 +135,19 @@ define(function(require) {
 
 				updateParticlePosition : function(particlePositionsArray, particleIndex) {
 
-					var instancePath = "sample.fluid.VisualizationTree.ELASTIC_sph.p[" + particleIndex + "]";
+					var particlePositionsIndex = particleIndex * 4;
+					var particleId = particlePositionsArray[particlePositionsIndex];
+
+					var particleKind = "LIQUID";
+
+					if (particleId < 0) {
+						particleKind = "ELASTIC"
+					}
+
+					particleId = Math.abs(particleId);
+
+					var instancePath =
+						"sample.fluid.VisualizationTree." + particleKind + "_sph.p[" + particleId + "]";
 
 //					console.log("instance path = ", instancePath);
 
@@ -147,11 +159,10 @@ define(function(require) {
 
 					if (threeObject) {
 
-						var particlePositionsIndex = particleIndex * 3;
 
-						var x = particlePositionsArray[particlePositionsIndex];
-						var y = particlePositionsArray[particlePositionsIndex + 1];
-						var z = particlePositionsArray[particlePositionsIndex + 2];
+						var x = particlePositionsArray[particlePositionsIndex + 1];
+						var y = particlePositionsArray[particlePositionsIndex + 2];
+						var z = particlePositionsArray[particlePositionsIndex + 3];
 
 						if (threeObject instanceof THREE.Vector3) {
 							threeObject.x = x;

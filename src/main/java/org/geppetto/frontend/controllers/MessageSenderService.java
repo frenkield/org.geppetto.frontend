@@ -43,17 +43,13 @@ public class MessageSenderService {
         }
     }
 
+
+
     public void sendMessage(GeppettoMessageInbound connection, String requestID, OUTBOUND_MESSAGE_TYPES type,
                             String update) {
 
         try {
-
-            if (!type.equals(OUTBOUND_MESSAGE_TYPES.SCENE_UPDATE)) {
-                preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
-            } else {
-                logger.info(")))))))))))))))) skipping update message - " + update.length());
-            }
-
+            preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -285,6 +281,11 @@ public class MessageSenderService {
 
                 elapsedTime = System.currentTimeMillis() - startTime;
                 logger.info(String.format("******* created json in %dms", elapsedTime));
+
+
+                byte[] compressedMessage = compressionUtils.compressMessageBinary(message);
+                logger.info("))))))))))))) if we were compressing message would be " + compressedMessage.length);
+
 
 
                 if (!useCompression || message.length() < 1000) {
