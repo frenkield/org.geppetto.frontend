@@ -29,56 +29,45 @@ public class MessageSenderService {
             new ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, senderQueue,
                     new ThreadPoolExecutor.DiscardOldestPolicy());
 
-    private static Log logger = LogFactory.getLog(MessageSenderService.class);
-
-
-
+    private static final int QUEUE_SIZE = 20;
+    private static final Log logger = LogFactory.getLog(MessageSenderService.class);
 
     public void sendMessage(GeppettoMessageInbound visitor, String message) {
 
-        try {
-            senderExecutor.execute(new MessageSender(visitor, message));
-        } catch (IOException e) {
-            e.printStackTrace();
+        senderExecutor.execute(new MessageSender(visitor, message));
+
+        if (senderQueue.size() > QUEUE_SIZE - 5) {
+            logger.info("message queue almost full - size = " + senderQueue.size());
         }
     }
-
-
 
     public void sendMessage(GeppettoMessageInbound connection, String requestID, OUTBOUND_MESSAGE_TYPES type,
                             String update) {
 
-        try {
-            preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
-        } catch (IOException e) {
-            e.printStackTrace();
+        preprocessorExecutor.execute(new Preprocessor(connection, requestID, type, update));
+
+        if (preprocessorQueue.size() > QUEUE_SIZE - 5) {
+            logger.info("preprocessor queue almost full - size = " + preprocessorQueue.size());
         }
     }
 
+    public void sendMessage(GeppettoMessageInbound connection, List<Double> particles) {
 
+        preprocessorExecutor.execute(new ParticlePreprocessor(connection, particles));
 
-    public void sendMessage(GeppettoMessageInbound connection, String requestID, OUTBOUND_MESSAGE_TYPES type,
-                            List<Double> particles) {
-
-        try {
-            senderExecutor.execute(new ParticlePreprocessor(connection, particles));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (preprocessorQueue.size() > QUEUE_SIZE - 5) {
+            logger.info("preprocessor queue almost full - size = " + preprocessorQueue.size());
         }
     }
-
-
 
     private class MessageSender implements Runnable {
 
         private GeppettoMessageInbound visitor;
         private String message;
 
-        public MessageSender(GeppettoMessageInbound visitor, String message) throws IOException {
+        public MessageSender(GeppettoMessageInbound visitor, String message) {
             this.visitor = visitor;
             this.message = message;
-
-            logger.info(">>>>>>>>>>>>>>>>>>>>> sender queue size = " + senderQueue.size());
         }
 
         public void run() {
@@ -100,54 +89,14 @@ public class MessageSenderService {
         }
     }
 
-
-
-
-//    private class DoubleMessageSender implements Runnable {
-//
-//        private GeppettoMessageInbound visitor;
-//        private double[] message;
-//
-//        public DoubleMessageSender(GeppettoMessageInbound visitor, double[] message) throws IOException {
-//            this.visitor = visitor;
-//            this.message = message;
-//
-//            logger.info(">>>>>>>>>>>>>>>>>>>>> sender queue size = " + senderQueue.size());
-//        }
-//
-//        public void run() {
-//
-//            long startTime = System.currentTimeMillis();
-//
-//            try {
-//
-//                visitor.getWsOutbound().writeBinaryMessage(DoubleBuffer.wrap(message));
-//
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            long elapsedTime = System.currentTimeMillis() - startTime;
-//
-//            logger.info(String.format("******* sent %d binary bytes in %dms", message.length, elapsedTime));
-//        }
-//    }
-
-
-
-
-
     private class BinaryMessageSender implements Runnable {
 
         private GeppettoMessageInbound visitor;
         private ByteBuffer message;
 
-        public BinaryMessageSender(GeppettoMessageInbound visitor, ByteBuffer message) throws IOException {
+        public BinaryMessageSender(GeppettoMessageInbound visitor, ByteBuffer message) {
             this.visitor = visitor;
             this.message = message;
-
-            logger.info(">>>>>>>>>>>>>>>>>>>>> sender queue size = " + senderQueue.size());
         }
 
         public void run() {
@@ -162,16 +111,9 @@ public class MessageSenderService {
             }
 
             long elapsedTime = System.currentTimeMillis() - startTime;
-
             logger.info(String.format("******* sent %d binary bytes in %dms", message.capacity(), elapsedTime));
         }
     }
-
-
-
-
-
-
 
     private class ParticlePreprocessor implements Runnable {
 
@@ -179,14 +121,11 @@ public class MessageSenderService {
         private List<Double> particles;
 
         private CompressionUtils compressionUtils = new CompressionUtils();
-        boolean useCompression = false;
 
-        public ParticlePreprocessor(GeppettoMessageInbound visitor, List<Double> particles) throws IOException {
+        public ParticlePreprocessor(GeppettoMessageInbound visitor, List<Double> particles) {
 
             this.visitor = visitor;
             this.particles = particles;
-
-            logger.info(">>>>>>>>>>>>>>>>>>>>> preprocessor queue size = " + preprocessorQueue.size());
         }
 
         public void run() {
@@ -204,43 +143,17 @@ public class MessageSenderService {
 
                 byte[] compressedMessage = compressionUtils.compressMessageBinary(byteBuffer.array());
                 ByteBuffer compressedByteBuffer = ByteBuffer.wrap(compressedMessage);
-                logger.info("********************** " + compressedMessage.length);
-
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                logger.info(String.format("******* compressed and created particle byte buffer in %dms", elapsedTime));
+                logger.info(String.format("created particle byte buffer and compressed in %dms", elapsedTime));
 
                 senderExecutor.execute(new BinaryMessageSender(visitor, compressedByteBuffer));
-
-
-
-
-
-//                if (!useCompression || message.length() < 1000) {
-//                    senderExecutor.execute(new MessageSender(visitor, message));
-//
-//                } else {
-
-
-//                    byte[] binaryMessage = compressionUtils.compressMessageBinary(message);
-//                    senderExecutor.execute(new BinaryMessageSender(visitor, binaryMessage));
-
-
-//                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
-
-
-
-
-
-
-
 
     private class Preprocessor implements Runnable {
 
@@ -252,14 +165,12 @@ public class MessageSenderService {
         boolean useCompression = false;
 
         public Preprocessor(GeppettoMessageInbound visitor, String requestId, OUTBOUND_MESSAGE_TYPES type,
-                            String update) throws IOException {
+                            String update) {
 
             this.visitor = visitor;
             this.requestId = requestId;
             this.type = type;
             this.update = update;
-
-            logger.info(">>>>>>>>>>>>>>>>>>>>> preprocessor queue size = " + preprocessorQueue.size());
         }
 
         public void run() {
@@ -283,9 +194,8 @@ public class MessageSenderService {
 
 
                 byte[] compressedMessage = compressionUtils.compressMessageBinary(message);
-                logger.info("))))))))))))) if we were compressing message would be " + compressedMessage.length);
-
-
+                logger.info(" if we were compressing message - " + message.length()
+                            + " to " + compressedMessage.length);
 
                 if (!useCompression || message.length() < 1000) {
                     senderExecutor.execute(new MessageSender(visitor, message));

@@ -704,7 +704,7 @@ public class GeppettoServletController {
 
         long start = System.currentTimeMillis();
 
-        messageSenderService.sendMessage(connection, requestID, type, particles);
+        messageSenderService.sendMessage(connection, particles);
 
         _logger.info("---------------- " + (System.currentTimeMillis() - start));
 

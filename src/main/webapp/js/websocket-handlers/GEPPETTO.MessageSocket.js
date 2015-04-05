@@ -44,6 +44,9 @@ define(function(require) {
 		var clientID = null;
 		var nextID = 0;
 		var connectionInterval = 300;
+		var messagesProcessedThisInterval = 0;
+		var intervalStartTime = 0;
+
 
 		/**
 		 * Web socket creation and communication
@@ -85,24 +88,33 @@ define(function(require) {
 					GEPPETTO.Console.debugLog(GEPPETTO.Resources.WEBSOCKET_CLOSED);
 				};
 
+
+
+
+
 				GEPPETTO.MessageSocket.socket.onmessage = function(msg) {
 
 					if(msg.data=="ping"){
 						return;
 					}
 
-
 					if (msg.data instanceof ArrayBuffer) {
 
+						if (intervalStartTime == 0) {
+							intervalStartTime = Date.now();
+						}
 
 						var messageData = uncompressMessage(msg.data);
-
-
 						var particlePositionsArray = new Float64Array(messageData.buffer);
+						GEPPETTO.SimulationHandler.onParticlesUpdate(particlePositionsArray);
 
+						messagesProcessedThisInterval++;
 
-						GEPPETTO.SimulationHandler.onParticlesUpdate(particlePositionsArray)
-
+						if (Date.now() - intervalStartTime >= 1000) {
+							console.log("frames per second", messagesProcessedThisInterval / (Date.now() - intervalStartTime) * 1000);
+							intervalStartTime = Date.now();
+							messagesProcessedThisInterval = 0;
+						}
 
 					} else {
 
@@ -233,13 +245,22 @@ define(function(require) {
 			return  JSON.stringify(object);
 		}
 
+		var compressionCounter = 0;
+
 		function uncompressMessage(compressedMessage) {
-			var pako = require("pako");
+
 			var messageBytes = new Uint8Array(compressedMessage);
 
-//			var message = pako.ungzip(messageBytes, {to:"string"});
+			var startTime = Date.now();
 
+			var pako = require("pako");
 			var message = pako.ungzip(messageBytes);
+
+			if (compressionCounter++ % 10 == 0) {
+
+				var endTime = Date.now();
+//				console.log("took", endTime - startTime);
+			}
 
 			return message;
 		}
