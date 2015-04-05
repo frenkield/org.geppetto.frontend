@@ -674,41 +674,14 @@ public class GeppettoServletController {
 	 * @param connection - Type of udpate to be send
 	 * @param reloadCanvas - update to be sent
 	 */
-	public void messageClient(String requestID,
-			GeppettoMessageInbound connection, OUTBOUND_MESSAGE_TYPES type,
-			String update) {
-
-
-        long start = System.currentTimeMillis();
+	public void messageClient(String requestID, GeppettoMessageInbound connection, OUTBOUND_MESSAGE_TYPES type,
+			                  String update) {
 
         messageSenderService.sendMessage(connection, requestID, type, update);
-
-
-//
-//
-//
-//        // get transport message to be sent to the client
-//		GeppettoTransportMessage transportMsg = TransportMessageFactory.getTransportMessage(requestID, type, update);
-//		String msg = new Gson().toJson(transportMsg);
-
-
-        _logger.info("---------------- " + (System.currentTimeMillis() - start));
-
-
 	}
 
-    public void messageClient(String requestID,
-                              GeppettoMessageInbound connection, OUTBOUND_MESSAGE_TYPES type,
-                              List<Double> particles) {
-
-
-        long start = System.currentTimeMillis();
-
+    public void messageClient(GeppettoMessageInbound connection, List<Double> particles) {
         messageSenderService.sendMessage(connection, particles);
-
-        _logger.info("---------------- " + (System.currentTimeMillis() - start));
-
-
     }
 
 	/**

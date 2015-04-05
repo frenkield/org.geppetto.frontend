@@ -120,27 +120,17 @@ public class MultiuserSimulationCallback implements ISimulationCallbackListener
 
 		logger.info("Simulation Frontend Update Finished: Took:" + (System.currentTimeMillis() - start));
 	}
-
-
-
-
-    @Override
-    public void particleUpdateReady(SimulationEvents event, String requestID, List<Double> particles) {
-
-        GeppettoServletController.getInstance().messageClient(requestID, _user, OUTBOUND_MESSAGE_TYPES.SCENE_UPDATE,
-                                                              particles);
-
-    }
-
-
-
-
-
-    /*
-         * (non-Javadoc)
-         *
-         * @see org.geppetto.core.simulation.ISimulationCallbackListener#error(org.geppetto.core.common.GeppettoErrorCodes, java.lang.String, java.lang.String)
-         */
+	
+	@Override
+	public void particleUpdateReady(SimulationEvents event, String requestID, List<Double> particles) {
+		GeppettoServletController.getInstance().messageClient(_user, particles);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.geppetto.core.simulation.ISimulationCallbackListener#error(org.geppetto.core.common.GeppettoErrorCodes, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void error(GeppettoErrorCodes errorCode, String classSource, String errorMessage, Exception e)
 	{

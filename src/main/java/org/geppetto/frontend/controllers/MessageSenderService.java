@@ -85,7 +85,7 @@ public class MessageSenderService {
 
             long elapsedTime = System.currentTimeMillis() - startTime;
 
-            logger.info(String.format("******* sent %d bytes in %dms", message.length(), elapsedTime));
+            logger.info(String.format("sent %d bytes in %dms", message.length(), elapsedTime));
         }
     }
 
@@ -111,7 +111,7 @@ public class MessageSenderService {
             }
 
             long elapsedTime = System.currentTimeMillis() - startTime;
-            logger.info(String.format("******* sent %d binary bytes in %dms", message.capacity(), elapsedTime));
+            logger.info(String.format("sent %d binary bytes in %dms", message.capacity(), elapsedTime));
         }
     }
 
@@ -183,14 +183,14 @@ public class MessageSenderService {
                         TransportMessageFactory.getTransportMessage(requestId, type, update);
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                logger.info(String.format("******* created transport message in %dms", elapsedTime));
+                logger.info(String.format("created transport message in %dms", elapsedTime));
 
                 startTime = System.currentTimeMillis();
 
                 String message = new Gson().toJson(transportMsg);
 
                 elapsedTime = System.currentTimeMillis() - startTime;
-                logger.info(String.format("******* created json in %dms", elapsedTime));
+                logger.info(String.format("created json in %dms", elapsedTime));
 
 
                 byte[] compressedMessage = compressionUtils.compressMessageBinary(message);
