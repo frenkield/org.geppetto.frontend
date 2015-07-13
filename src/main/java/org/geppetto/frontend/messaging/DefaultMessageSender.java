@@ -204,7 +204,7 @@ public class DefaultMessageSender implements MessageSender
 			pause();
 			preprocessorQueue.clear();
 			senderQueue.clear();
-			logger.debug("purged queues");
+			logger.debug("Purged queues");
 			resume();
 		}
 	}
@@ -249,7 +249,7 @@ public class DefaultMessageSender implements MessageSender
 		}
 		catch(Exception e)
 		{
-			logger.warn("failed to send binary message", e);
+			logger.warn("Failed to send binary message", e);
 			notifyListeners(MessageSenderEvent.Type.MESSAGE_SEND_FAILED);
 		}
 	}
@@ -301,7 +301,7 @@ public class DefaultMessageSender implements MessageSender
 		}
 		catch(Exception e)
 		{
-			logger.warn("failed to process message before transmission", e);
+			logger.warn("Failed to process message before transmission", e);
 			notifyListeners(MessageSenderEvent.Type.MESSAGE_SEND_FAILED);
 		}
 	}
@@ -313,11 +313,11 @@ public class DefaultMessageSender implements MessageSender
 
 		GeppettoTransportMessage transportMessage = TransportMessageFactory.getTransportMessage(requestId, type, update);
 
-		logger.debug(String.format("created transport message in %dms", System.currentTimeMillis() - startTime));
+		logger.debug(String.format("Created transport message in %dms", System.currentTimeMillis() - startTime));
 
 		startTime = System.currentTimeMillis();
 		String message = new Gson().toJson(transportMessage);
-		logger.debug(String.format("created json in %dms", System.currentTimeMillis() - startTime));
+		logger.debug(String.format("Created json in %dms", System.currentTimeMillis() - startTime));
 
 		return message;
 	}
@@ -346,13 +346,13 @@ public class DefaultMessageSender implements MessageSender
 			wsOutbound.writeTextMessage(buffer);
 			if(messageType.equals("experiment_status"))
 			{
-				logger.info(String.format("sent text message - %s, length: %d bytes, took: %d ms", messageType, message.length(), System.currentTimeMillis() - startTime));
+				logger.info(String.format("Sent text message - %s, length: %d bytes, took: %d ms", messageType, message.length(), System.currentTimeMillis() - startTime));
 			}
 
 		}
 		catch(IOException e)
 		{
-			logger.warn("failed to send message", e);
+			logger.warn("Failed to send message", e);
 			notifyListeners(MessageSenderEvent.Type.MESSAGE_SEND_FAILED);
 		}
 	}
@@ -374,10 +374,10 @@ public class DefaultMessageSender implements MessageSender
 			// ByteBuffer buffer = ByteBuffer.wrap(message);
 			wsOutbound.writeBinaryMessage(buffer);
 
-			String logMessage = "sent binary/compressed message - %s, length: %d (%d) bytes, duration: %d ms";
+			String logMessage = "Sent binary/compressed message - %s, length: %d (%d) bytes, duration: %d ms";
 			if(fromQueue)
 			{
-				logMessage = "sent binary/compressed message from queue - %s, length: %d (%d) bytes, duration: %d ms";
+				logMessage = "Sent binary/compressed message from queue - %s, length: %d (%d) bytes, duration: %d ms";
 			}
 
 			logger.info(String.format(logMessage, messageType, message.length, uncompressedMessageSize, System.currentTimeMillis() - startTime));
@@ -385,7 +385,7 @@ public class DefaultMessageSender implements MessageSender
 		}
 		catch(IOException e)
 		{
-			logger.warn("failed to send binary message", e);
+			logger.warn("Failed to send binary message", e);
 			notifyListeners(MessageSenderEvent.Type.MESSAGE_SEND_FAILED);
 		}
 	}
