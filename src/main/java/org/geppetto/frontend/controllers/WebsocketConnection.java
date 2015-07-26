@@ -33,17 +33,14 @@
 package org.geppetto.frontend.controllers;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.WsOutbound;
 import org.apache.commons.logging.Log;
@@ -153,38 +150,7 @@ public class WebsocketConnection extends MessageInbound implements MessageSender
 	 */
 	public void sendBinaryMessage(String requestID, Path path)
 	{
-		// TODO: We are sending file name and data but it can be improved to send a type and message
-		try
-		{
-			long startTime = System.currentTimeMillis();
-
-			// get filename and file content
-			byte[] name = path.getFileName().toString().getBytes("UTF-8");
-			byte[] data = Files.readAllBytes(path);
-
-			// add to the buffer:
-			// - type of message
-			// - filename length (filename length is needed client side to parse the message)
-			// - filename
-			// - file content
-			int bufferSize = 1 + 1 + name.length + data.length;
-			ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
-			buffer.put(BigInteger.valueOf(1).toByteArray());
-			buffer.put(BigInteger.valueOf(name.length).toByteArray());
-			buffer.put(name);
-			buffer.put(data);
-
-			// write binary message in the socket
-			getWsOutbound().writeBinaryMessage(buffer);
-
-			String debug = ((long) System.currentTimeMillis() - startTime) + "ms were spent sending a file of " + bufferSize / 1024 + "KB to the client";
-			logger.info(debug);
-		}
-		catch(IOException ignore)
-		{
-			logger.error("Unable to communicate with client " + ignore.getMessage());
-			ConnectionsManager.getInstance().removeConnection(this);
-		}
+		messageSender.sendFile(path);
 	}
 
 	/**
